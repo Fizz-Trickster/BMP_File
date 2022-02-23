@@ -51,8 +51,7 @@ end
 // FILE READ
 always @(posedge clk) begin
   if(i_de) begin
-    #1;
-    $fscanf(fp_in, "%d %d %d\n", data_R, data_G, data_B);
+    #1 $fscanf(fp_in, "%d %d %d\n", data_R, data_G, data_B);
   end
 end
 
