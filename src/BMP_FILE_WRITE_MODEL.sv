@@ -30,10 +30,15 @@ parameter VRES = 240          )(
   input   [ 3:0][ 7:0]  biClrImportant  
 
 );
+localparam MEM_WIDTH = HRES * VRES;
 
-logic   [19:0] pixCnt;
+logic   [0: MEM_WIDTH-1][23:0]  mem       ;
+logic                   [19:0]  pixCnt    ;
+int                             fp        ;
+int                             idx       ;
+int                             frameCnt  ;
+string                          file_path ;
 
-logic   [0:HRES*VRES-1][23:0] mem   ;
 
 always @(posedge clk, negedge rst_n ) begin 
   if(!rst_n) begin     
@@ -52,11 +57,6 @@ always @(posedge clk, negedge rst_n ) begin
     mem[pixCnt] <= i_data;
   end
 end
-
-int     fp;
-int     idx;
-int     frameCnt;
-string  file_path;
 
 always @(posedge i_vsync) begin
   frameCnt  = frameCnt + 'd1;
