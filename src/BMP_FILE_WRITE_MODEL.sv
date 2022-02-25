@@ -53,113 +53,62 @@ always @(posedge clk, negedge rst_n ) begin
   end
 end
 
-int fp_bmp;
-int idx;
+int     fp;
+int     idx;
+int     frameCnt;
+string  file_path;
 
-always @(negedge i_vsync) begin
-  //fp_bmp_in = $fopen("24bpp-320x240.bmp", "wb");
-  fp_bmp = $fopen("output.bmp", "wb");
-  
-  foreach(bfType          [i])  $fwrite(fp_bmp, "%c", bfType          [i]);
-  foreach(bfSize          [i])  $fwrite(fp_bmp, "%c", bfSize          [i]);
-  foreach(bfResrved1      [i])  $fwrite(fp_bmp, "%c", bfResrved1      [i]);
-  foreach(bfResrved2      [i])  $fwrite(fp_bmp, "%c", bfResrved2      [i]);
-  foreach(bfOffBits       [i])  $fwrite(fp_bmp, "%c", bfOffBits       [i]);
+always @(posedge i_vsync) begin
+  frameCnt  = frameCnt + 'd1;
+  $sformat(file_path, "output_%02d.bmp", frameCnt);
 
-  foreach(biSize          [i])  $fwrite(fp_bmp, "%c", biSize          [i]);
-  foreach(biWidth         [i])  $fwrite(fp_bmp, "%c", biWidth         [i]);
-  foreach(biHeight        [i])  $fwrite(fp_bmp, "%c", biHeight        [i]);
-  foreach(biPlanes        [i])  $fwrite(fp_bmp, "%c", biPlanes        [i]);
-  foreach(biBitCount      [i])  $fwrite(fp_bmp, "%c", biBitCount      [i]);
-  foreach(biCompression   [i])  $fwrite(fp_bmp, "%c", biCompression   [i]);
-  foreach(biSizeImage     [i])  $fwrite(fp_bmp, "%c", biSizeImage     [i]);
-  foreach(biXPelsPerMeter [i])  $fwrite(fp_bmp, "%c", biXPelsPerMeter [i]);
-  foreach(biYPelsPerMeter [i])  $fwrite(fp_bmp, "%c", biYPelsPerMeter [i]);
-  foreach(biClrUsed       [i])  $fwrite(fp_bmp, "%c", biClrUsed       [i]);
-  foreach(biClrImportant  [i])  $fwrite(fp_bmp, "%c", biClrImportant  [i]);
+  fp = $fopen(file_path, "wb");
+  writeBITMAPFILE;
+
+  $fclose(fp);
+end
+
+task writeBITMAPFILE;
+begin
+  foreach(bfType          [i])  $fwrite(fp, "%c", bfType          [i]);
+  foreach(bfSize          [i])  $fwrite(fp, "%c", bfSize          [i]);
+  foreach(bfResrved1      [i])  $fwrite(fp, "%c", bfResrved1      [i]);
+  foreach(bfResrved2      [i])  $fwrite(fp, "%c", bfResrved2      [i]);
+  foreach(bfOffBits       [i])  $fwrite(fp, "%c", bfOffBits       [i]);
+
+  foreach(biSize          [i])  $fwrite(fp, "%c", biSize          [i]);
+  foreach(biWidth         [i])  $fwrite(fp, "%c", biWidth         [i]);
+  foreach(biHeight        [i])  $fwrite(fp, "%c", biHeight        [i]);
+  foreach(biPlanes        [i])  $fwrite(fp, "%c", biPlanes        [i]);
+  foreach(biBitCount      [i])  $fwrite(fp, "%c", biBitCount      [i]);
+  foreach(biCompression   [i])  $fwrite(fp, "%c", biCompression   [i]);
+  foreach(biSizeImage     [i])  $fwrite(fp, "%c", biSizeImage     [i]);
+  foreach(biXPelsPerMeter [i])  $fwrite(fp, "%c", biXPelsPerMeter [i]);
+  foreach(biYPelsPerMeter [i])  $fwrite(fp, "%c", biYPelsPerMeter [i]);
+  foreach(biClrUsed       [i])  $fwrite(fp, "%c", biClrUsed       [i]);
+  foreach(biClrImportant  [i])  $fwrite(fp, "%c", biClrImportant  [i]);
 
   for(int rowCnt=0; rowCnt<VRES; rowCnt++) begin
     for(int colCnt=0; colCnt<HRES; colCnt++) begin
       idx = ((VRES-(rowCnt+1))*HRES)+colCnt;
-      $fwrite(fp_bmp, "%c", mem[idx][ 0 +:8]);    // B
-      $fwrite(fp_bmp, "%c", mem[idx][ 8 +:8]);    // G
-      $fwrite(fp_bmp, "%c", mem[idx][16 +:8]);    // R
+      $fwrite(fp, "%c", mem[idx][ 0 +:8]);    // B
+      $fwrite(fp, "%c", mem[idx][ 8 +:8]);    // G
+      $fwrite(fp, "%c", mem[idx][16 +:8]);    // R
     end
   end
-
-  //for(int i=0; i<HRES*VRES; i++) begin
-  //  $fwrite(fp_bmp, "%c", mem[i][0  +:8]);    // B
-  //  $fwrite(fp_bmp, "%c", mem[i][8  +:8]);    // G
-  //  $fwrite(fp_bmp, "%c", mem[i][16 +:8]);    // R
-  //  $display("idx : %0d\t %d %d %d", i, mem[i][0  +:8], mem[i][8  +:8], mem[i][16 +:8]);
-  //end
-
 end
+endtask
 
-// FILE CLOSE
-always @(posedge i_vsync) begin
-  $fclose(fp_bmp);
+task writePPMFILE;
+begin
+  $fdisplay(fp, "P3");
+  $fdisplay(fp, "%0d %0d", HRES, VRES);
+  $fdisplay(fp, "255");
+
+  for(int i=0; i<HRES*VRES; i++) begin
+    $fdisplay(fp,"%d %d %d", mem[i][16 +:8], mem[i][8  +:8], mem[i][ 0 +:8]);
+  end
 end
-
-//// PPM FILE OPEN
-//int fp_ppm;
-//always @(negedge i_vsync) begin
-//  fp_ppm = $fopen("output.ppm", "w");
-//
-//  $fdisplay(fp_ppm, "P3");
-//  $fdisplay(fp_ppm, "%0d %0d", HRES, VRES);
-//  $fdisplay(fp_ppm, "255");
-//
-//  for(int i=0; i<HRES*VRES; i++) begin
-//    $fdisplay(fp_ppm,"%d %d %d", mem[i][16 +:8], mem[i][8  +:8], mem[i][ 0 +:8]);
-//  end
-//end
-//
-//// PPM FILE CLOSE
-//always @(posedge i_vsync) begin
-//  $fclose(fp_ppm);
-//end
-
-//typedef enum logic[2:0] { A, B, C, D, E } State; 
-//
-//State currentState, nextState;
-//
-//always_ff @( posedge clk, negedge rst_n ) begin 
-//   if(!reset_n)     currentState <= A;
-//   else             currentState <= nextState;
-//end
-//
-//always_comb begin 
-//   case (currentState)
-//       A :  begin
-//            if(X)   nextState = C;
-//            else    nextState = B;
-//       end
-//
-//       B :  begin
-//            if(X)   nextState = D;
-//            else    nextState = B;
-//       end   
-//
-//       C :  begin
-//            if(X)   nextState = C;
-//            else    nextState = E;
-//       end   
-//
-//       D :  begin
-//            if(X)   nextState = C;
-//            else    nextState = E;
-//       end  
-//
-//       E :  begin
-//            if(X)   nextState = D;
-//            else    nextState = B;
-//       end   
-//
-//       default:     nextState = A;
-//   endcase 
-//end
-//
-//assign Y = (currentState == D || currentState == E);
+endtask 
 
 endmodule
