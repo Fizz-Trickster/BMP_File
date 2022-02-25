@@ -50,16 +50,33 @@ always #(CLK_PERIOD/2) clk = ~clk;
 //  $dumpvars;
 //end
 
-disp_sync_gen #(
-  .VPULSE  (1),
-  .HPULSE  (1),
+//disp_sync_gen #(
+//  .VPULSE  (3),
+//  .HPULSE  (3),
+//  .VRES    (VRES),
+//  .HRES    (HRES),
+//  .VBP     (3),
+//  .VFP     (5),
+//  .HBP     (3),
+//  .HFP     (5)   
+//)   u_disp_sync_gen (
+//      .i_clk      (clk
+//  ),  .rst_n      (rst_n
+//  ),  .o_vsync    (t_vsync
+//  ),  .o_hsync    (t_hsync
+//  ),  .o_de       (t_de
+//  ));
+
+disp_sync_gen_fsm #(
+  .VPULSE  (3),
+  .HPULSE  (3),
   .VRES    (VRES),
   .HRES    (HRES),
   .VBP     (3),
   .VFP     (5),
-  .HBP     (4),
-  .HFP     (4)   
-)   u_disp_sync_gen (
+  .HBP     (3),
+  .HFP     (5)   
+)   u_disp_sync_gen_fsm (
       .i_clk      (clk
   ),  .rst_n      (rst_n
   ),  .o_vsync    (t_vsync
