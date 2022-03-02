@@ -15,11 +15,15 @@ parameter HFP     = 5   )(
 //========================================== 
 // Input / Output Description
 //========================================== 
-  input			i_clk,
-  input			rst_n,
-  output		o_hsync,
-  output		o_vsync,
-  output 		o_de 
+  input			        i_clk,
+  input			        rst_n,
+
+  output  Vstate_t  Vstate,
+  output  Hstate_t  Hstate,
+
+  output		        o_hsync,
+  output		        o_vsync,
+  output            o_de 
 );
 
 localparam V_TOTAL = VPULSE + VBP + VRES + VFP;
@@ -266,5 +270,8 @@ end
 assign o_vsync  = vsync_d   ;
 assign o_hsync  = hsync_d[1];
 assign o_de     = de_d[1]   ;
+
+assign Vstate   = cur_Vstate;
+assign Hstate   = cur_Hstate;
 
 endmodule

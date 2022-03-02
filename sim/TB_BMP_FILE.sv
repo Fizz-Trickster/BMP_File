@@ -1,5 +1,7 @@
 `timescale 1ns / 1ns
 
+import state_pkg::*;
+
 module TB_BMP_FILE;
 
 parameter           HRES = 320;
@@ -10,6 +12,10 @@ bit                 clk;    // 2-state, default : 0
 bit                 rst_n;
 logic               in;
 logic               out;
+
+// Vstate, Hstate
+Vstate_t            Vstate;
+Hstate_t            Hstate;
 
 // VSYNC, HSYNC, DE
 logic               t_vsync;
@@ -79,6 +85,8 @@ disp_sync_gen_fsm #(
 )   u_disp_sync_gen_fsm (
       .i_clk      (clk
   ),  .rst_n      (rst_n
+  ),  .Vstate     (Vstate
+  ),  .Hstate     (Hstate
   ),  .o_vsync    (t_vsync
   ),  .o_hsync    (t_hsync
   ),  .o_de       (t_de
