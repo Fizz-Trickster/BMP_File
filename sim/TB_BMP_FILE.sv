@@ -4,8 +4,15 @@ import state_pkg::*;
 
 module TB_BMP_FILE;
 
-parameter           HRES = 320;
-parameter           VRES = 240;
+parameter           VPULSE  = 1;
+parameter           VBP     = 3;
+parameter           VRES    = 240;
+parameter           VFP     = 5;
+
+parameter           HPULSE  = 1;
+parameter           HBP     = 3;
+parameter           HRES    = 320;
+parameter           HFP     = 5;  
 
 //logic             clk;    // 4-state, default : x
 bit                 clk;    // 2-state, default : 0
@@ -73,18 +80,20 @@ always #(CLK_PERIOD/2) clk = ~clk;
 //  ),  .o_de       (t_de
 //  ));
 
-disp_sync_gen_fsm #(
-  .VPULSE  (3),
-  .HPULSE  (3),
-  .VRES    (VRES),
-  .HRES    (HRES),
-  .VBP     (3),
-  .VFP     (5),
-  .HBP     (3),
-  .HFP     (5)   
-)   u_disp_sync_gen_fsm (
+disp_sync_gen_fsm u_disp_sync_gen_fsm (
       .i_clk      (clk
   ),  .rst_n      (rst_n
+
+  ),  .VPULSE     (VPULSE
+  ),  .VBP        (VBP
+  ),  .VRES       (VRES
+  ),  .VFP        (VFP
+
+  ),  .HPULSE     (HPULSE
+  ),  .HBP        (HBP
+  ),  .HRES       (HRES
+  ),  .HFP        (HFP  
+
   ),  .Vstate     (Vstate
   ),  .Hstate     (Hstate
   ),  .o_vsync    (t_vsync
