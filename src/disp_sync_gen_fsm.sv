@@ -15,14 +15,14 @@ parameter HFP     = 5   )(
 //========================================== 
 // Input / Output Description
 //========================================== 
-  input			        i_clk,
-  input			        rst_n,
+  input             i_clk,
+  input             rst_n,
 
   output  Vstate_t  Vstate,
   output  Hstate_t  Hstate,
 
-  output		        o_hsync,
-  output		        o_vsync,
+  output            o_hsync,
+  output            o_vsync,
   output            o_de 
 );
 
